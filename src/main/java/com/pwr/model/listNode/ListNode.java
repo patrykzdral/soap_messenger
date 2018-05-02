@@ -1,6 +1,8 @@
 package com.pwr.model.listNode;
 
-public class ListNode{
+import java.util.Objects;
+
+public class ListNode {
     private String layerNumberAndNodeName;
     private Integer port;
     private String nodeType;
@@ -67,5 +69,19 @@ public class ListNode{
                 ", nextHost='" + nextHost + '\'' +
                 ", nextPort=" + nextPort +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ListNode listNode = (ListNode) o;
+        return Objects.equals(layerNumberAndNodeName, listNode.layerNumberAndNodeName) && Objects.equals(port, listNode.port) && Objects.equals(nodeType, listNode.nodeType) && Objects.equals(nextHost, listNode.nextHost) && Objects.equals(nextPort, listNode.nextPort);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(layerNumberAndNodeName, port, nodeType, nextHost, nextPort);
     }
 }

@@ -9,9 +9,14 @@ import java.util.Set;
 public class MessageBody {
     @XmlAttribute(name = "message")
     private String message;
+
     @XmlElementWrapper(name = "onlineNodes")
     @XmlElement(name = "onlineNode")
     private Set<ListNode> onlineNodeSet;
+
+    @XmlElementWrapper(name = "onlineLayers")
+    @XmlElement(name = "onlineLayer")
+    private Set<String> onlineLayers;
 
     public MessageBody() {
     }
@@ -20,8 +25,9 @@ public class MessageBody {
         this.message = message;
     }
 
-    public MessageBody(Set<ListNode> onlineNodeSet) {
+    public MessageBody(Set<ListNode> onlineNodeSet,Set<String> onlineLayers) {
         this.onlineNodeSet = onlineNodeSet;
+        this.onlineLayers = onlineLayers;
     }
 
     public MessageBody(String message, Set<ListNode> onlineNodeSet) {
@@ -43,6 +49,14 @@ public class MessageBody {
 
     public void setOnlineNodeSet(Set<ListNode> onlineNodeSet) {
         this.onlineNodeSet = onlineNodeSet;
+    }
+
+    public Set<String> getOnlineLayers() {
+        return onlineLayers;
+    }
+
+    public void setOnlineLayers(Set<String> onlineLayers) {
+        this.onlineLayers = onlineLayers;
     }
 }
 

@@ -5,12 +5,10 @@ import com.pwr.model.nodes.RouterNode;
 import com.pwr.model.nodes.SimpleNode;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.collections.ObservableSet;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 import java.io.IOException;
@@ -20,8 +18,9 @@ import java.util.logging.Logger;
 
 public class Main extends Application {
     public static ObservableSet<ListNode> nodesObservableList = FXCollections.observableSet();
+    public static ObservableSet<String> layersObservableList = FXCollections.observableSet();
     private RouterNode routerNode;
-    private SimpleNode layerNode;
+    private SimpleNode simpleNode;
 
     @Override
     public void start(Stage primaryStage) {
@@ -47,15 +46,23 @@ public class Main extends Application {
     }
 
 
-    @Override
     public void stop() {
+        try {
+            if (simpleNode != null) {
+                simpleNode.stopListening();
+            } else if (routerNode != null)
+                routerNode.stopListening();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         System.exit(0);
     }
 
     public static void main(String[] args) {
         launch(args);
     }
-    
+
     private void getInputParameters(NodeController nodeController) {
         Map<String, String> parameters = getParameters().getNamed();
 
@@ -68,8 +75,8 @@ public class Main extends Application {
 
         switch (nodeType) {
             case "L":
-                layerNode = new SimpleNode(nodeController, layerNumber, nodeName, port, nextLayerNodePort, nextLayerNodeHost);
-                nodeController.setNode(layerNode);
+                simpleNode = new SimpleNode(nodeController, layerNumber, nodeName, port, nextLayerNodePort, nextLayerNodeHost);
+                nodeController.setNode(simpleNode);
                 break;
             case "R":
                 Integer nextRouterNodePort = Integer.valueOf(parameters.get("nextRouterNodePort"));

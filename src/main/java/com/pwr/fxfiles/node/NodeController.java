@@ -20,10 +20,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.soap.SOAPException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.*;
 
 public class NodeController  implements Initializable {
     public TextArea textAreaReceivedMessages;
@@ -41,7 +38,7 @@ public class NodeController  implements Initializable {
     public VBox vBoxExactly;
     public Button buttonExactly;
     public VBox vBoxLayer;
-    public ComboBox comboBoxLayer;
+    public ComboBox<String> comboBoxLayer;
     public Button buttonSendToLayer;
     public TableView <ListNode> tableViewNodes;
     public TableColumn <ListNode,String> tableColumnNumber;
@@ -61,6 +58,8 @@ public class NodeController  implements Initializable {
         tableColumnHost.setCellValueFactory(new PropertyValueFactory<>("nextHost"));
         tableColumnPort.setCellValueFactory(new PropertyValueFactory<>("port"));
         tableViewNodes.setItems(FXCollections.observableArrayList(new ArrayList<>(Main.nodesObservableList)));
+        comboBoxLayer.setItems(FXCollections.observableArrayList(new ArrayList<>(Main.layersObservableList)));
+
         setToggleGroup();
     }
 
@@ -68,9 +67,17 @@ public class NodeController  implements Initializable {
         Main.nodesObservableList = FXCollections.observableSet(onlineNodes);
         refreshTableView();
     }
+    public void setOnlineLayers(Set<String> onlineLayers){
+        Main.layersObservableList = FXCollections.observableSet(onlineLayers);
+        refreshTableView();
+    }
 
     public Set<ListNode> getOnlineNodes(){
         return Main.nodesObservableList;
+    }
+
+    public Set<String> getOnlineLayers(){
+        return Main.layersObservableList;
     }
 
 
@@ -234,12 +241,17 @@ public class NodeController  implements Initializable {
 
         node.startListening();
         //SimpleNode tempNode = SimpleNode(node.getNodeController(),node.getLayerNumber(), node.getNodeName(), node.getPort(), node.getPort(), String nextLayerNodeHost)
-        Main.nodesObservableList.add(new ListNode(layerNode.getNodeFullName(), node.getPort(), "L", node.getNextLayerNodeHost(), node.getNextLayerNodePort()));
+        ListNode listNode = new ListNode(layerNode.getNodeFullName(), node.getPort(), "L", node.getNextLayerNodeHost(), node.getNextLayerNodePort());
+
+        Main.nodesObservableList.add(listNode);
+        Main.layersObservableList.add(listNode.getLayerNumberAndNodeName().substring(0,1));
+        refreshTableView();
+
         //node.s
 
        try {
-           // node.sendMessage(layerNode.getNodeFullName().substring(0,1), layerNode.getNodeFullName().substring(2,3), "unicast", new MessageBody(getOnlineNodes()));
-            node.sendMessage("", "", "global_broadcast", new MessageBody(getOnlineNodes())); } catch (SOAPException | JAXBException e) {
+            node.sendMessage("", "", "global_broadcast", new MessageBody(getOnlineNodes(),getOnlineLayers()));
+       } catch (SOAPException | JAXBException e) {
 
         }
 
@@ -255,11 +267,12 @@ public class NodeController  implements Initializable {
         labelForward.setText(node.getNextLayerNodeHost() + ":" + node.getNextLayerNodePort());
 
         node.startListening();
-
-        Main.nodesObservableList.add(new ListNode(routerNode.getNodeFullName(), node.getPort(), "R - " + routerNode.getNextRouterNodeHost() + ":" + routerNode.getNextRouterNodePort(), node.getNextLayerNodeHost(), node.getNextLayerNodePort()));
-
-           try {
-             node.sendMessage("", "", "global_broadcast", new MessageBody(getOnlineNodes()));
+        ListNode listNode = new ListNode(routerNode.getNodeFullName(), node.getPort(), "R - " + routerNode.getNextRouterNodeHost() + ":" + routerNode.getNextRouterNodePort(), node.getNextLayerNodeHost(), node.getNextLayerNodePort());
+        Main.nodesObservableList.add(listNode);
+        Main.layersObservableList.add(listNode.getLayerNumberAndNodeName().substring(0,1));
+        refreshTableView();
+        try {
+             node.sendMessage("", "", "global_broadcast", new MessageBody(getOnlineNodes(),getOnlineLayers()));
           } catch (SOAPException | JAXBException e) {
 
           }
@@ -269,6 +282,8 @@ public class NodeController  implements Initializable {
 
     private void refreshTableView(){
         tableViewNodes.setItems(FXCollections.observableArrayList(new ArrayList<>(Main.nodesObservableList)));
+        comboBoxLayer.setItems(FXCollections.observableArrayList(new ArrayList<>(Main.layersObservableList)));
+
     }
 
 }

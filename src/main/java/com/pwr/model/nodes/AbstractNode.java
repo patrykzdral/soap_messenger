@@ -81,7 +81,6 @@ public abstract class AbstractNode {
                         try {
                             SOAPMessage soapMessage = MessageFactory.newInstance().createMessage(null,
                                     clientSocket.getInputStream());
-                            System.out.println("odebralem");
                             this.onSoapMessageReceived(soapMessage);
                             clientSocket.close();
                         } catch (IOException | SOAPException ignored) {
@@ -116,10 +115,13 @@ public abstract class AbstractNode {
     protected void forwardTo(SOAPMessage soapMessage, String host, int port) throws SOAPException, IOException {
         System.out.println(host);
         System.out.println(port);
-        Socket socket = new Socket(host, port);
-        soapMessage.writeTo(socket.getOutputStream());
-        socket.getOutputStream().flush();
-        socket.close();
+        try {
+            Socket socket = new Socket(host, port);
+            soapMessage.writeTo(socket.getOutputStream());
+            socket.getOutputStream().flush();
+            socket.close();
+        }catch (Exception e){
+        }
     }
 
     public void onSoapMessageReceived(SOAPMessage soapMessage) {
@@ -137,14 +139,22 @@ public abstract class AbstractNode {
                 System.out.println("3");
                 if (messageBody.getOnlineNodeSet()==null){
                     System.out.println("4");
-                    getNodeController().showReceivedMessage(messageHeader.getSender(), messageBody.getMessage());}
+                    getNodeController().showReceivedMessage(messageHeader.getSender(), messageBody.getMessage());
+                }
                 else {
                     Set<ListNode> onlineNodeSet = nodeController.getOnlineNodes();
+                    Set<String> onlineLayers = nodeController.getOnlineLayers();
+                    System.out.println(onlineLayers);
+                    System.out.println(messageBody.getOnlineNodeSet());
                     onlineNodeSet.addAll(messageBody.getOnlineNodeSet());
+                    onlineLayers.addAll(messageBody.getOnlineLayers());
+
+
                     if (onlineNodeSet.size()>messageBody.getOnlineNodeSet().size()) {
                         messageBody.setOnlineNodeSet(onlineNodeSet);
-                        messageHeader.setVisitedNodes(null);
+                        messageBody.setOnlineLayers(onlineLayers);
                         soapMessage = SoapUtil.createEnvelope(messageHeader,messageBody);
+                        messageHeader.setVisitedNodes(null);
                     }
                     else {
                         System.out.println("dodanie");
@@ -153,6 +163,8 @@ public abstract class AbstractNode {
                         soapMessage = SoapUtil.createEnvelope(messageHeader,messageBody);
                     }
                     nodeController.setOnlineNodes(messageBody.getOnlineNodeSet());
+                    System.out.println("LISTA KURWA "+messageBody.getOnlineLayers());
+                    nodeController.setOnlineLayers(messageBody.getOnlineLayers());
                     sendMessage(soapMessage);
                 }
             }

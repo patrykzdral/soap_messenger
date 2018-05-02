@@ -49,7 +49,7 @@ public class RouterNode extends AbstractNode {
                 forwardTo(soapMessage, nextRouterNodeHost, nextRouterNodePort);
             } else {
                 forwardTo(soapMessage, getNextLayerNodeHost(), getNextLayerNodePort());
-                    //forwardTo(soapMessage, nextRouterNodeHost, nextRouterNodePort);
+                forwardTo(soapMessage, nextRouterNodeHost, nextRouterNodePort);
             }
         } catch (SOAPException | IOException | JAXBException e) {
             e.printStackTrace();
