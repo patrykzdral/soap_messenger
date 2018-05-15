@@ -128,24 +128,17 @@ public abstract class AbstractNode {
         try {
             Message messageHeader = SoapUtil.extractMessageHeader(soapMessage);
 
-            System.out.println("1");
             if (messageHeader.checkIfVisitedNodesContainsNode(getNodeFullName()))
                 return;
 
-            System.out.println("2");
             if (messageHeader.isReceiver(getLayerNumber(), getNodeName())){
-                System.out.println("2.5");
                 MessageBody messageBody = SoapUtil.extractMessage(soapMessage);
-                System.out.println("3");
                 if (messageBody.getOnlineNodeSet()==null){
-                    System.out.println("4");
                     getNodeController().showReceivedMessage(messageHeader.getSender(), messageBody.getMessage());
                 }
                 else {
                     Set<ListNode> onlineNodeSet = nodeController.getOnlineNodes();
                     Set<String> onlineLayers = nodeController.getOnlineLayers();
-                    System.out.println(onlineLayers);
-                    System.out.println(messageBody.getOnlineNodeSet());
                     onlineNodeSet.addAll(messageBody.getOnlineNodeSet());
                     onlineLayers.addAll(messageBody.getOnlineLayers());
 
@@ -157,28 +150,20 @@ public abstract class AbstractNode {
                         messageHeader.setVisitedNodes(null);
                     }
                     else {
-                        System.out.println("dodanie");
                         messageHeader.addVisitedNode(getNodeFullName());
                         messageBody = SoapUtil.extractMessage(soapMessage);
                         soapMessage = SoapUtil.createEnvelope(messageHeader,messageBody);
                     }
                     nodeController.setOnlineNodes(messageBody.getOnlineNodeSet());
-                    System.out.println("LISTA KURWA "+messageBody.getOnlineLayers());
                     nodeController.setOnlineLayers(messageBody.getOnlineLayers());
                     sendMessage(soapMessage);
                 }
             }
-            System.out.println("5");
-            System.out.println(messageHeader.isGlobalBroadcast() );
-            System.out.println(messageHeader.isLocalBroadcast() );
-            System.out.println(messageHeader.isUnicast() );
 
             if (messageHeader.isGlobalBroadcast() || messageHeader.isLocalBroadcast() || !messageHeader.isReceiver(getLayerNumber(), getNodeName()))
-                System.out.println("LUJ");
+
                 if (!messageHeader.checkIfVisitedNodesContainsNode(getNodeFullName())) {
 
-                    System.out.println("moj");
-                    System.out.println("LISTA JEST :"+ messageHeader.getVisitedNodes());
                     messageHeader.addVisitedNode(getNodeFullName());
                     MessageBody messageBody = SoapUtil.extractMessage(soapMessage);
                     soapMessage = SoapUtil.createEnvelope(messageHeader,messageBody);

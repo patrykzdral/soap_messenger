@@ -14,9 +14,7 @@ public class RouterNode extends AbstractNode {
     private Integer nextRouterNodePort;
     private String nextRouterNodeHost;
 
-    public RouterNode(NodeController nodeController, String layerNumber, String nodeName, Integer port,
-                      Integer nextLayerNodePort, String nextLayerNodeHost, Integer nextRouterNodePort,
-                      String nextRouterNodeHost) {
+    public RouterNode(NodeController nodeController, String layerNumber, String nodeName, Integer port, Integer nextLayerNodePort, String nextLayerNodeHost, Integer nextRouterNodePort, String nextRouterNodeHost) {
         super(nodeController, layerNumber, nodeName, port, nextLayerNodePort, nextLayerNodeHost);
         this.nextRouterNodePort = nextRouterNodePort;
         this.nextRouterNodeHost = nextRouterNodeHost;
@@ -36,16 +34,12 @@ public class RouterNode extends AbstractNode {
             Message messageHeader = SoapUtil.extractMessageHeader(soapMessage);
 
             if (messageHeader.isLocalBroadcast() && messageHeader.getReceiverLayerNumber().equals(getLayerNumber())) {
-                System.out.println("chuj6");
                 forwardTo(soapMessage, getNextLayerNodeHost(), getNextLayerNodePort());
             } else if (messageHeader.isLocalBroadcast() && !messageHeader.getReceiverLayerNumber().equals(getLayerNumber())) {
-                System.out.println("chuj5");
                 forwardTo(soapMessage, nextRouterNodeHost, nextRouterNodePort);
             } else if (messageHeader.isUnicast() && messageHeader.getReceiverLayerNumber().equals(getLayerNumber())) {
-                System.out.println("chuj4");
                 forwardTo(soapMessage, getNextLayerNodeHost(), getNextLayerNodePort());
             } else if (messageHeader.isUnicast() && !messageHeader.getReceiverLayerNumber().equals(getLayerNumber())) {
-                System.out.println("chuj2");
                 forwardTo(soapMessage, nextRouterNodeHost, nextRouterNodePort);
             } else {
                 forwardTo(soapMessage, getNextLayerNodeHost(), getNextLayerNodePort());

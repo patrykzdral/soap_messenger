@@ -81,7 +81,6 @@ public class Message {
 
     public Boolean checkIfVisitedNodesContainsNode(String node) {
         if (visitedNodes != null){
-            System.out.println("WYNIK KURWA:" +visitedNodes.stream().anyMatch(visitedNode -> visitedNode.equals(node)));
             return visitedNodes.stream().anyMatch(visitedNode -> visitedNode.equals(node));
 
         }
